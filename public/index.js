@@ -2,11 +2,23 @@ const socket = io();
 let isDrawingAllowed = true;
 let submitted = false;
 
+// 🔄 Emit joinLobby as soon as socket connects, if name is stored
+socket.on("connect", () => {
+  const storedName = sessionStorage.getItem("playerName");
+  if (storedName) {
+    socket.emit("joinLobby", storedName);
+  }
+});
+
 document.getElementById("joinBtn").onclick = () => {
   const name = document.getElementById("nameInput").value.trim();
   if (!name) return;
+
   sessionStorage.setItem("playerName", name);
-  socket.emit("joinLobby", name);
+
+  if (socket.connected) {
+    socket.emit("joinLobby", name);
+  }
 };
 
 socket.on("lobbyFull", () => {
