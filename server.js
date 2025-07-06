@@ -25,9 +25,12 @@ io.on("connection", socket => {
   socket.on("joinLobby", name => {
     if (players.length >= 3) return;
 
-    const player = { id: socket.id, name, ready: false };
-    players.push(player);
-    io.emit("lobbyUpdate", players);
+    function getRandomColor() {
+  const colors = ["#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4"];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+const player = { id: socket.id, name, color: getRandomColor(), ready: false };
   });
 
   socket.on("playerReady", () => {
@@ -47,6 +50,13 @@ io.on("connection", socket => {
     players = players.filter(p => p.id !== socket.id);
     io.emit("lobbyUpdate", players);
   });
+});
+
+socket.on("requestPlayerColor", () => {
+  const player = players.find(p => p.id === socket.id);
+  if (player) {
+    socket.emit("yourColor", player.color);
+  }
 });
 
 server.listen(PORT, () => {

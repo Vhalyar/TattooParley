@@ -20,7 +20,7 @@ socket.on("lobbyUpdate", players => {
   list.innerHTML = "";
   players.forEach(p => {
     const li = document.createElement("li");
-    li.textContent = p.name + (p.ready ? " (Ready)" : "");
+    li.innerHTML = `<span style="color:${p.color}">${p.name}</span> ${p.ready ? "(Ready)" : ""}`;
     list.appendChild(li);
   });
 });
@@ -29,6 +29,8 @@ socket.on("startGame", promptImage => {
   document.getElementById("lobbyScreen").style.display = "none";
   document.getElementById("gameScreen").style.display = "block";
   document.getElementById("promptImage").src = promptImage;
+  
+  socket.emit("requestPlayerColor");
 
   const canvas = document.getElementById("drawCanvas");
   const ctx = canvas.getContext("2d");
@@ -44,4 +46,8 @@ socket.on("startGame", promptImage => {
     ctx.arc(e.clientX - rect.left, e.clientY - rect.top, 2, 0, 2 * Math.PI);
     ctx.fill();
   };
+});
+
+socket.on("yourColor", color => {
+  document.getElementById("drawCanvas").style.border = `4px solid ${color}`;
 });
