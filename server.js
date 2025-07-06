@@ -28,11 +28,27 @@ function getRandomColor() {
 }
 
 io.on("connection", socket => {
-  socket.on("joinLobby", name => {
-    if (players.length >= 3) return;
+  console.log(`Socket connected: ${socket.id}`);
 
-    const player = { id: socket.id, name, color: getRandomColor(), ready: false };
+  socket.on("joinLobby", name => {
+    // Prevent duplicate joins
+    const alreadyJoined = players.find(p => p.id === socket.id);
+    if (alreadyJoined) return;
+
+    if (players.length >= 3) {
+      socket.emit("lobbyFull");
+      return;
+    }
+
+    const player = {
+      id: socket.id,
+      name,
+      color: getRandomColor(),
+      ready: false
+    };
+
     players.push(player);
+    console.log(`Player joined: ${name} (${socket.id})`);
     io.emit("lobbyUpdate", players);
   });
 
@@ -78,6 +94,7 @@ io.on("connection", socket => {
   });
 
   socket.on("disconnect", () => {
+    console.log(`Socket disconnected: ${socket.id}`);
     players = players.filter(p => p.id !== socket.id);
     io.emit("lobbyUpdate", players);
   });
