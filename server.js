@@ -37,11 +37,10 @@ io.on("connection", socket => {
       io.emit("lobbyUpdate", players);
     }
 
-    if (players.length === 3 && players.every(p => p.ready)) {
-      const promptImage = getRandomPrompt();
-      io.emit("startGame", promptImage);
-    }
-  });
+    if (players.every(p => p.ready) && players.length > 0) {
+		const promptImage = getRandomPrompt();
+		io.emit("startGame", promptImage);
+	}
 
   socket.on("disconnect", () => {
     players = players.filter(p => p.id !== socket.id);
