@@ -1,5 +1,7 @@
 const socket = io();
 let playerName = "";
+let isDrawingAllowed = true;
+let submitted = false;
 
 document.getElementById("joinBtn").onclick = () => {
   playerName = document.getElementById("nameInput").value.trim();
@@ -29,50 +31,55 @@ socket.on("startGame", promptImage => {
   document.getElementById("lobbyScreen").style.display = "none";
   document.getElementById("gameScreen").style.display = "block";
   document.getElementById("promptImage").src = promptImage;
-	let isDrawingAllowed = true;
-	let submitted = false;
 
-  // Ask server what our assigned color is
   socket.emit("requestPlayerColor");
 
-  // Drawing canvas setup
   const canvas = document.getElementById("drawCanvas");
   const ctx = canvas.getContext("2d");
   let drawing = false;
+  isDrawingAllowed = true;
+  submitted = false;
 
-  canvas.onmousedown = () => drawing = true;
+  canvas.onmousedown = () => {
+    if (!isDrawingAllowed) return;
+    drawing = true;
+  };
   canvas.onmouseup = () => drawing = false;
   canvas.onmouseleave = () => drawing = false;
   canvas.onmousemove = (e) => {
-    if (!drawing) return;
+    if (!drawing || !isDrawingAllowed) return;
     const rect = canvas.getBoundingClientRect();
     ctx.fillStyle = "black";
     ctx.beginPath();
     ctx.arc(e.clientX - rect.left, e.clientY - rect.top, 2, 0, 2 * Math.PI);
     ctx.fill();
   };
-  let timeLeft = 60; // seconds
-const timerText = document.getElementById("timerText");
 
-const interval = setInterval(() => {
-  timeLeft--;
+  // Timer logic
+  let timeLeft = 60;
+  const timerText = document.getElementById("timerText");
   timerText.textContent = `Time left: ${timeLeft}s`;
 
-  if (timeLeft <= 0) {
-    clearInterval(interval);
-    timerText.textContent = "Time's up!";
-    
-    // Disable drawing
-    canvas.onmousedown = null;
-    canvas.onmouseup = null;
-    canvas.onmousemove = null;
+  const interval = setInterval(() => {
+    timeLeft--;
+    timerText.textContent = `Time left: ${timeLeft}s`;
 
-    // In future: send drawing to server
-    console.log("Drawing time ended");
-  }
-}, 1000);
+    if (timeLeft <= 0 && !submitted) {
+      clearInterval(interval);
+      timerText.textContent = "Time's up!";
+      isDrawingAllowed = false;
+      submitted = true;
 
-timerText.textContent = `Time left: ${timeLeft}s`;
+      const canvasData = canvas.toDataURL("image/png");
+      socket.emit("submitDrawing", {
+        name: playerName,
+        image: canvasData
+      });
+
+      document.getElementById("gameScreen").style.display = "none";
+      document.body.insertAdjacentHTML("beforeend", "<p id='waitMsg'>Waiting for other players to finish...</p>");
+    }
+  }, 1000);
 });
 
 socket.on("yourColor", color => {

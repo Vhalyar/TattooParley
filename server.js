@@ -44,10 +44,29 @@ io.on("connection", socket => {
     }
 
     if (players.every(p => p.ready) && players.length > 0) {
-		const promptImage = getRandomPrompt();
-		currentPrompt = promptImage;
-		drawingSubmissions = [];
-		io.emit("startGame", promptImage);
+      const promptImage = getRandomPrompt();
+      currentPrompt = promptImage;
+      drawingSubmissions = [];
+      io.emit("startGame", promptImage);
+    }
+  });
+
+  socket.on("submitDrawing", ({ name, image }) => {
+    const player = players.find(p => p.id === socket.id);
+    if (player) {
+      drawingSubmissions.push({
+        id: socket.id,
+        name,
+        color: player.color,
+        image
+      });
+
+      if (drawingSubmissions.length === players.length) {
+        io.emit("startVoting", {
+          prompt: currentPrompt,
+          drawings: drawingSubmissions
+        });
+      }
     }
   });
 
@@ -62,25 +81,6 @@ io.on("connection", socket => {
     players = players.filter(p => p.id !== socket.id);
     io.emit("lobbyUpdate", players);
   });
-});
-
-socket.on("submitDrawing", ({ name, image }) => {
-  const player = players.find(p => p.id === socket.id);
-  if (player) {
-    drawingSubmissions.push({
-      id: socket.id,
-      name,
-      color: player.color,
-      image
-    });
-
-    if (drawingSubmissions.length === players.length) {
-      io.emit("startVoting", {
-        prompt: currentPrompt,
-        drawings: drawingSubmissions
-      });
-    }
-  }
 });
 
 server.listen(PORT, () => {
