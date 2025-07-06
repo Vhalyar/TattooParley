@@ -49,6 +49,28 @@ socket.on("startGame", promptImage => {
     ctx.arc(e.clientX - rect.left, e.clientY - rect.top, 2, 0, 2 * Math.PI);
     ctx.fill();
   };
+  let timeLeft = 60; // seconds
+const timerText = document.getElementById("timerText");
+
+const interval = setInterval(() => {
+  timeLeft--;
+  timerText.textContent = `Time left: ${timeLeft}s`;
+
+  if (timeLeft <= 0) {
+    clearInterval(interval);
+    timerText.textContent = "Time's up!";
+    
+    // Disable drawing
+    canvas.onmousedown = null;
+    canvas.onmouseup = null;
+    canvas.onmousemove = null;
+
+    // In future: send drawing to server
+    console.log("Drawing time ended");
+  }
+}, 1000);
+
+timerText.textContent = `Time left: ${timeLeft}s`;
 });
 
 socket.on("yourColor", color => {

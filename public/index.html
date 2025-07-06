@@ -8,12 +8,14 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Name Entry Screen -->
   <div id="nameScreen">
     <h1>Enter your name</h1>
     <input type="text" id="nameInput" />
     <button id="joinBtn">Join Lobby</button>
   </div>
 
+  <!-- Lobby Screen -->
   <div id="lobbyScreen" style="display:none;">
     <h2>Lobby</h2>
     <p id="lobbyStatus">Waiting for players...</p>
@@ -21,13 +23,21 @@
     <button id="readyBtn">Ready</button>
   </div>
 
+  <!-- Game Screen -->
   <div id="gameScreen" style="display:none;">
     <h2>Interpret this image:</h2>
     <img id="promptImage" src="" alt="Prompt" width="300" />
-    <canvas id="drawCanvas" width="400" height="400"></canvas>
-    <p id="timerText"></p>
+    
+    <!-- Drawing Timer -->
+    <p id="timerText" style="font-weight: bold; font-size: 18px;"></p>
+
+    <!-- Drawing Area -->
+    <div id="canvasWrapper" style="margin-top: 10px;">
+      <canvas id="drawCanvas" width="400" height="400" style="background-color: white;"></canvas>
+    </div>
   </div>
 
+  <!-- Voting Screen (Coming Soon) -->
   <div id="votingScreen" style="display:none;">
     <h2>Vote for the best interpretation</h2>
     <img id="votePromptImage" src="" alt="Prompt" width="300" />
