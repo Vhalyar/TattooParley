@@ -26,15 +26,15 @@
   <!-- Game Screen -->
 <div id="gameScreen" style="display:none;">
   <h2>Interpret this image:</h2>
-  <div id="gameLayout" style="display: flex; gap: 20px; align-items: flex-start;">
-    <!-- Left: Prompt image -->
-    <div>
-      <img id="promptImage" src="" alt="Prompt" width="300" />
+  <div id="gameLayout" style="display: flex; gap: 40px; align-items: flex-start;">
+    <!-- Left Column: Image + Timer -->
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <img id="promptImage" src="" alt="Prompt" width="300" style="display: block;" />
+      <p id="timerText" style="font-weight: bold; font-size: 18px; margin-top: 10px;"></p>
     </div>
 
-    <!-- Right: Drawing + timer -->
+    <!-- Right Column: Canvas -->
     <div>
-      <p id="timerText" style="font-weight: bold; font-size: 18px;"></p>
       <canvas id="drawCanvas" width="400" height="400" style="background-color: white;"></canvas>
     </div>
   </div>
