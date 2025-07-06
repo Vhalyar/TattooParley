@@ -24,18 +24,21 @@
   </div>
 
   <!-- Game Screen -->
-  <div id="gameScreen" style="display:none;">
-    <h2>Interpret this image:</h2>
-    <img id="promptImage" src="" alt="Prompt" width="300" />
-    
-    <!-- Drawing Timer -->
-    <p id="timerText" style="font-weight: bold; font-size: 18px;"></p>
+<div id="gameScreen" style="display:none;">
+  <h2>Interpret this image:</h2>
+  <div id="gameLayout" style="display: flex; gap: 20px; align-items: flex-start;">
+    <!-- Left: Prompt image -->
+    <div>
+      <img id="promptImage" src="" alt="Prompt" width="300" />
+    </div>
 
-    <!-- Drawing Area -->
-    <div id="canvasWrapper" style="margin-top: 10px;">
+    <!-- Right: Drawing + timer -->
+    <div>
+      <p id="timerText" style="font-weight: bold; font-size: 18px;"></p>
       <canvas id="drawCanvas" width="400" height="400" style="background-color: white;"></canvas>
     </div>
   </div>
+</div>
 
   <!-- Voting Screen (Coming Soon) -->
   <div id="votingScreen" style="display:none;">
