@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Drawing Interpretation Game</title>
+  <script defer src="/socket.io/socket.io.js"></script>
+  <script defer src="index.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="nameScreen">
+    <h1>Enter your name</h1>
+    <input type="text" id="nameInput" />
+    <button id="joinBtn">Join Lobby</button>
+  </div>
+
+  <div id="lobbyScreen" style="display:none;">
+    <h2>Lobby</h2>
+    <p id="lobbyStatus">Waiting for players...</p>
+    <ul id="playerList"></ul>
+    <button id="readyBtn">Ready</button>
+  </div>
+
+  <div id="gameScreen" style="display:none;">
+    <h2>Interpret this image:</h2>
+    <img id="promptImage" src="" alt="Prompt" width="300" />
+    <canvas id="drawCanvas" width="400" height="400"></canvas>
+    <p id="timerText"></p>
+  </div>
+
+  <div id="votingScreen" style="display:none;">
+    <h2>Vote for the best interpretation</h2>
+    <img id="votePromptImage" src="" alt="Prompt" width="300" />
+    <div id="drawingsContainer"></div>
+  </div>
+</body>
+</html>
