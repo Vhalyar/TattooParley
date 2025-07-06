@@ -4,14 +4,13 @@ let submitted = false;
 
 document.getElementById("joinBtn").onclick = () => {
   const name = document.getElementById("nameInput").value.trim();
-  if (name) {
-    sessionStorage.setItem("playerName", name);
-    socket.emit("joinLobby", name);
-  }
+  if (!name) return;
+  sessionStorage.setItem("playerName", name);
+  socket.emit("joinLobby", name);
 };
 
 socket.on("lobbyFull", () => {
-  alert("The lobby is full. Please try again later.");
+  alert("Lobby is full. Please try again later.");
 });
 
 document.getElementById("readyBtn").onclick = () => {
@@ -59,7 +58,6 @@ socket.on("startGame", promptImage => {
     ctx.fill();
   };
 
-  // Timer logic
   let timeLeft = 60;
   const timerText = document.getElementById("timerText");
   timerText.textContent = `Time left: ${timeLeft}s`;
@@ -74,8 +72,8 @@ socket.on("startGame", promptImage => {
       isDrawingAllowed = false;
       submitted = true;
 
-      const canvasData = canvas.toDataURL("image/png");
-      socket.emit("submitDrawing", { image: canvasData });
+      const image = canvas.toDataURL("image/png");
+      socket.emit("submitDrawing", { image });
 
       document.getElementById("gameScreen").style.display = "none";
       document.body.insertAdjacentHTML("beforeend", "<p id='waitMsg'>Waiting for other players to finish...</p>");

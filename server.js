@@ -28,27 +28,31 @@ function getRandomColor() {
 }
 
 io.on("connection", socket => {
-  console.log(`Socket connected: ${socket.id}`);
+  console.log(`🟢 Socket connected: ${socket.id}`);
 
   socket.on("joinLobby", name => {
-    // Prevent duplicate joins
-    const alreadyJoined = players.find(p => p.id === socket.id);
-    if (alreadyJoined) return;
+    // Prevent multiple joins for same socket
+    const alreadyIn = players.find(p => p.id === socket.id);
+    if (alreadyIn) {
+      console.log(`⚠️ Socket ${socket.id} already joined`);
+      return;
+    }
 
     if (players.length >= 3) {
+      console.log(`❌ Lobby full: ${socket.id} rejected`);
       socket.emit("lobbyFull");
       return;
     }
 
-    const player = {
+    const newPlayer = {
       id: socket.id,
       name,
       color: getRandomColor(),
       ready: false
     };
 
-    players.push(player);
-    console.log(`Player joined: ${name} (${socket.id})`);
+    players.push(newPlayer);
+    console.log(`✅ Player joined: ${name} (${socket.id})`);
     io.emit("lobbyUpdate", players);
   });
 
@@ -59,11 +63,11 @@ io.on("connection", socket => {
       io.emit("lobbyUpdate", players);
     }
 
-    if (players.every(p => p.ready) && players.length > 0) {
-      const promptImage = getRandomPrompt();
-      currentPrompt = promptImage;
+    if (players.length > 0 && players.every(p => p.ready)) {
+      currentPrompt = getRandomPrompt();
       drawingSubmissions = [];
-      io.emit("startGame", promptImage);
+      console.log("🎮 All players ready. Starting game.");
+      io.emit("startGame", currentPrompt);
     }
   });
 
@@ -77,7 +81,10 @@ io.on("connection", socket => {
         image
       });
 
+      console.log(`📥 Drawing submitted by ${player.name} (${socket.id})`);
+
       if (drawingSubmissions.length === players.length) {
+        console.log("📤 All drawings received. Starting voting.");
         io.emit("startVoting", {
           prompt: currentPrompt,
           drawings: drawingSubmissions
@@ -94,12 +101,12 @@ io.on("connection", socket => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`Socket disconnected: ${socket.id}`);
+    console.log(`🔴 Socket disconnected: ${socket.id}`);
     players = players.filter(p => p.id !== socket.id);
     io.emit("lobbyUpdate", players);
   });
 });
 
 server.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+  console.log(`🚀 Server listening on http://localhost:${PORT}`);
 });
