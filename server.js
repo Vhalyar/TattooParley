@@ -41,6 +41,7 @@ io.on("connection", socket => {
 		const promptImage = getRandomPrompt();
 		io.emit("startGame", promptImage);
 	}
+});
 
   socket.on("disconnect", () => {
     players = players.filter(p => p.id !== socket.id);
