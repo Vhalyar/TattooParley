@@ -1,12 +1,12 @@
 const socket = io();
-let playerName = "";
 let isDrawingAllowed = true;
 let submitted = false;
 
 document.getElementById("joinBtn").onclick = () => {
-  playerName = document.getElementById("nameInput").value.trim();
-  if (playerName) {
-    socket.emit("joinLobby", playerName);
+  const name = document.getElementById("nameInput").value.trim();
+  if (name) {
+    socket.emit("joinLobby", name);
+    sessionStorage.setItem("playerName", name); // Store name per tab
   }
 };
 
@@ -71,6 +71,7 @@ socket.on("startGame", promptImage => {
       submitted = true;
 
       const canvasData = canvas.toDataURL("image/png");
+      const playerName = sessionStorage.getItem("playerName") || "Anonymous";
       socket.emit("submitDrawing", {
         name: playerName,
         image: canvasData
