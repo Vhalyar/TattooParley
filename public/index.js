@@ -6,7 +6,6 @@ document.getElementById("joinBtn").onclick = () => {
   const name = document.getElementById("nameInput").value.trim();
   if (name) {
     socket.emit("joinLobby", name);
-    sessionStorage.setItem("playerName", name); // Store name per tab
   }
 };
 
@@ -71,11 +70,7 @@ socket.on("startGame", promptImage => {
       submitted = true;
 
       const canvasData = canvas.toDataURL("image/png");
-      const playerName = sessionStorage.getItem("playerName") || "Anonymous";
-      socket.emit("submitDrawing", {
-        name: playerName,
-        image: canvasData
-      });
+      socket.emit("submitDrawing", { image: canvasData });
 
       document.getElementById("gameScreen").style.display = "none";
       document.body.insertAdjacentHTML("beforeend", "<p id='waitMsg'>Waiting for other players to finish...</p>");

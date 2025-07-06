@@ -51,12 +51,12 @@ io.on("connection", socket => {
     }
   });
 
-  socket.on("submitDrawing", ({ name, image }) => {
+  socket.on("submitDrawing", ({ image }) => {
     const player = players.find(p => p.id === socket.id);
     if (player) {
       drawingSubmissions.push({
         id: socket.id,
-        name,
+        name: player.name,
         color: player.color,
         image
       });
