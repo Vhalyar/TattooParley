@@ -29,15 +29,18 @@ socket.on("startGame", promptImage => {
   document.getElementById("lobbyScreen").style.display = "none";
   document.getElementById("gameScreen").style.display = "block";
   document.getElementById("promptImage").src = promptImage;
-  
+
+  // Ask server what our assigned color is
   socket.emit("requestPlayerColor");
 
+  // Drawing canvas setup
   const canvas = document.getElementById("drawCanvas");
   const ctx = canvas.getContext("2d");
   let drawing = false;
 
   canvas.onmousedown = () => drawing = true;
   canvas.onmouseup = () => drawing = false;
+  canvas.onmouseleave = () => drawing = false;
   canvas.onmousemove = (e) => {
     if (!drawing) return;
     const rect = canvas.getBoundingClientRect();
@@ -49,5 +52,6 @@ socket.on("startGame", promptImage => {
 });
 
 socket.on("yourColor", color => {
-  document.getElementById("drawCanvas").style.border = `4px solid ${color}`;
+  const canvas = document.getElementById("drawCanvas");
+  canvas.style.border = `4px solid ${color}`;
 });

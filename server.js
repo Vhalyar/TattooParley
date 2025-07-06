@@ -12,7 +12,6 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 let players = [];
-let readyCount = 0;
 
 function getRandomPrompt() {
   const imageDir = path.join(__dirname, "public/images");
@@ -21,16 +20,18 @@ function getRandomPrompt() {
   return "/images/" + file;
 }
 
-io.on("connection", socket => {
-  socket.on("joinLobby", name => {
-    if (players.length >= 3) return;
-
-    function getRandomColor() {
+function getRandomColor() {
   const colors = ["#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4"];
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
-const player = { id: socket.id, name, color: getRandomColor(), ready: false };
+io.on("connection", socket => {
+  socket.on("joinLobby", name => {
+    if (players.length >= 3) return;
+
+    const player = { id: socket.id, name, color: getRandomColor(), ready: false };
+    players.push(player);
+    io.emit("lobbyUpdate", players);
   });
 
   socket.on("playerReady", () => {
@@ -41,22 +42,22 @@ const player = { id: socket.id, name, color: getRandomColor(), ready: false };
     }
 
     if (players.every(p => p.ready) && players.length > 0) {
-		const promptImage = getRandomPrompt();
-		io.emit("startGame", promptImage);
-	}
-});
+      const promptImage = getRandomPrompt();
+      io.emit("startGame", promptImage);
+    }
+  });
+
+  socket.on("requestPlayerColor", () => {
+    const player = players.find(p => p.id === socket.id);
+    if (player) {
+      socket.emit("yourColor", player.color);
+    }
+  });
 
   socket.on("disconnect", () => {
     players = players.filter(p => p.id !== socket.id);
     io.emit("lobbyUpdate", players);
   });
-});
-
-socket.on("requestPlayerColor", () => {
-  const player = players.find(p => p.id === socket.id);
-  if (player) {
-    socket.emit("yourColor", player.color);
-  }
 });
 
 server.listen(PORT, () => {
